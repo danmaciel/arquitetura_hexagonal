@@ -1,0 +1,32 @@
+{
+  "name": "arquitetura",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "test": "jest",
+    "migration:make": "knex migrate:make --knexfile ./src/exemplo/adapters/db/knex/knexfile.ts",
+    "migration:up": "knex migrate:latest --knexfile ./src/exemplo/adapters/db/knex/knexfile.ts",
+    "migration:down": "knex migrate:rollback --knexfile ./src/exemplo/adapters/db/knex/knexfile.ts"
+  },
+  "keywords": [],
+  "author": "danmaciel",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.3.3",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
+    "knex": "^3.1.0"
+  }
+}
