@@ -1,15 +1,15 @@
-import type CrudGenerico from "../../ports/CrudGenerico";
+import type UsuarioRepository from "../../ports/UsuarioRepository";
 import type UsuarioModel from "./UsuarioModel";
 
 
 export default class BuscaPorEmailUsuarioUsecase {
 
     constructor(
-        private colecao: CrudGenerico<UsuarioModel>,
+        private colecao: UsuarioRepository,
     ) {}
 
     async execute(email: string) {
-        const usuario = await this.colecao.buscaPor("email", email);
+        const usuario = await this.colecao.buscarPorEmail(email);
         return usuario || null; 
     }
 }
