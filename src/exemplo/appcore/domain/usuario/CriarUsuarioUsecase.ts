@@ -16,7 +16,7 @@ export default class CriarUsuarioUsecase {
         if (!nome.trim()) {
             throw new Error("O nome do usuário é obrigatório.");
         }
-        if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             throw new Error("Informe um e-mail válido.");
         }
         if (!senha.trim()) {
