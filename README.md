@@ -249,4 +249,4 @@ O workflow do GitHub Actions executa `npm ci`, `npm run build`, `npm test -- --r
 
 O banco SQLite local não deve ser versionado. Execute `npm run migration:up` para inicializar a base de desenvolvimento quando necessário. O banco anteriormente presente no Git ainda pode ser encontrado no histórico antigo.
 
-As dependências devem ser auditadas antes de considerar o projeto pronto para produção; o pipeline pode permanecer bloqueado enquanto houver vulnerabilidades de severidade alta/crítica.
+Na revisão de novembro de 2026, a auditoria de dependências passou sem alertas de severidade alta ou crítica, mas ainda reportou 16 moderados e 4 baixos (principalmente dependências transitivas de ferramentas de desenvolvimento). O controle de qualidade continua bloqueando novos alertas altos/críticos. Os alertas remanescentes devem ser acompanhados; a aprovação no CI **não** significa ausência de riscos.
