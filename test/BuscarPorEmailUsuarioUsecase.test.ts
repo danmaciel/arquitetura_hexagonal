@@ -1,5 +1,6 @@
 import CriptografiaSenha from "../src/exemplo/adapters/auth/CriptografiaSenha";
 import conexao from "../src/exemplo/adapters/db/knex/conexao";
+import { rmSync } from "node:fs";
 import UsuarioCrud from "../src/exemplo/adapters/db/UsuarioCrud";
 import type CrudGenerico from "../src/exemplo/appcore/ports/CrudGenerico";
 import BuscaPorEmailUsuarioUsecase from "../src/exemplo/appcore/domain/usuario/BuscaPorEmailUsuarioUsecase";
@@ -15,17 +16,20 @@ const nomeTeste = "Antonio Santos";
 const senhaTeste = "123456";
 
 beforeAll(async () => {
-   await conexao.table('usuarios').truncate();
+    await conexao.migrate.latest();
+    await conexao.table("usuarios").del();
 });
 
 // clean up between each test in case anything lingers
 afterEach(async () => {
-   await conexao.table('usuarios').truncate();
+   await conexao.table("usuarios").del();
 });
 
 // close database connection when the tests finish
 afterAll(async () => {
     await conexao.destroy();
+    const file = process.env.SQLITE_DB_PATH;
+    if (file) rmSync(file, { force: true });
 });
 
 test("Deve buscar um usuario", async () => {
