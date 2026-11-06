@@ -1,4 +1,4 @@
-import type CrudGenerico from "../src/exemplo/appcore/ports/CrudGenerico";
+import type UsuarioRepository from "../src/exemplo/appcore/ports/UsuarioRepository";
 import CriarUsuarioUsecase from "../src/exemplo/appcore/domain/usuario/CriarUsuarioUsecase";
 import CriptografiaSenha from "../src/exemplo/adapters/auth/CriptografiaSenha";   
 import type UsuarioModel from "../src/exemplo/appcore/domain/usuario/UsuarioModel";
@@ -7,7 +7,7 @@ import { rmSync } from "node:fs";
 import UsuarioCrud from "../src/exemplo/adapters/db/UsuarioCrud";
 import UsuarioJaCadastradoError from "../src/exemplo/appcore/domain/errors/UsuarioJaCadastradoError";
 
-const crud: CrudGenerico<UsuarioModel> = new UsuarioCrud();
+const crud: UsuarioRepository = new UsuarioCrud();
 const criptografia = new CriptografiaSenha();
 const criarUsuarioUsecase = new CriarUsuarioUsecase(crud, criptografia);
 const emailTeste: string = "abc@gmail.com";

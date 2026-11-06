@@ -24,10 +24,10 @@ test("adapter retorna a entidade que persistiu", async () => {
     const criado = await repositorio.adicionar(usuario);
 
     expect(criado).toEqual(usuario);
-    const encontrado = await repositorio.buscaPor("email", usuario.email);
+    const encontrado = await repositorio.buscarPorEmail( usuario.email);
     expect(encontrado).toMatchObject({ id: usuario.id, nome: usuario.nome, email: usuario.email });
 });
 
 test("adapter retorna null ao não encontrar usuário", async () => {
-    await expect(repositorio.buscaPor("email", "inexistente@example.invalid")).resolves.toBeNull();
+    await expect(repositorio.buscarPorEmail( "inexistente@example.invalid")).resolves.toBeNull();
 });

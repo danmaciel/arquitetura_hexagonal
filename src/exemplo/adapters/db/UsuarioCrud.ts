@@ -1,9 +1,9 @@
-import type CrudGenerico from "../../appcore/ports/CrudGenerico";
+import type UsuarioRepository from "../../appcore/ports/UsuarioRepository";
 import type UsuarioModel from "../../appcore/domain/usuario/UsuarioModel";
 import conexao from "./knex/conexao";
 
 
-export default class UsuarioCrud implements CrudGenerico<UsuarioModel> {
+export default class UsuarioCrud implements UsuarioRepository {
    
     private static tableUsuarios="usuarios";
 
@@ -13,10 +13,10 @@ export default class UsuarioCrud implements CrudGenerico<UsuarioModel> {
         return item;   
     }
     
-    async buscaPor(campo: string, valor: any): Promise<UsuarioModel | null> {
+    async buscarPorEmail(email: string): Promise<UsuarioModel | null> {
 
         const usuario = await conexao(UsuarioCrud.tableUsuarios)
-            .where(campo, valor)
+            .where("email", email)
             .first<UsuarioModel>();
         return usuario ?? null;
     }

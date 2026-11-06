@@ -2,12 +2,12 @@ import CriptografiaSenha from "../src/exemplo/adapters/auth/CriptografiaSenha";
 import conexao from "../src/exemplo/adapters/db/knex/conexao";
 import { rmSync } from "node:fs";
 import UsuarioCrud from "../src/exemplo/adapters/db/UsuarioCrud";
-import type CrudGenerico from "../src/exemplo/appcore/ports/CrudGenerico";
+import type UsuarioRepository from "../src/exemplo/appcore/ports/UsuarioRepository";
 import BuscaPorEmailUsuarioUsecase from "../src/exemplo/appcore/domain/usuario/BuscaPorEmailUsuarioUsecase";
 import CriarUsuarioUsecase from "../src/exemplo/appcore/domain/usuario/CriarUsuarioUsecase";
 import type UsuarioModel from "../src/exemplo/appcore/domain/usuario/UsuarioModel";
 
-const crud: CrudGenerico<UsuarioModel> = new UsuarioCrud();
+const crud: UsuarioRepository = new UsuarioCrud();
 const criptografia = new CriptografiaSenha();
 const criarUsuarioUsecase = new CriarUsuarioUsecase(crud, criptografia);
 const buscarPorEmailUsuarioUsecase = new BuscaPorEmailUsuarioUsecase(crud);
