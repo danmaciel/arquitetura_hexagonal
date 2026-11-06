@@ -13,6 +13,16 @@ export default class CriarUsuarioUsecase {
     ) {}
 
     async execute(nome: string, email: string, senha: string) {
+        if (!nome.trim()) {
+            throw new Error("O nome do usuário é obrigatório.");
+        }
+        if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+            throw new Error("Informe um e-mail válido.");
+        }
+        if (!senha.trim()) {
+            throw new Error("A senha não pode estar vazia.");
+        }
+
         const usuarioExistente = await this.colecao.buscarPorEmail(email);
         if (usuarioExistente) {
             throw new UsuarioJaCadastradoError();
