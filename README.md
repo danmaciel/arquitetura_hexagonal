@@ -37,7 +37,7 @@ O projeto segue o padrão de **Arquitetura Hexagonal**, dividido em 3 camadas:
 ┌──────────────────────┐  ┌──────────────────────┐
 │  Ports (Interfaces)  │  │  Adapters (Implem.)  │
 │                      │  │                      │
-│ - CrudGenerico<T>    │→→│ - UsuarioCrud        │
+│ - UsuarioRepository    │→→│ - UsuarioCrud        │
 │ - ProvedorCriptogr.  │→→│ - CriptografiaSenha  │
 │                      │  │ - CriptSenhaReal     │
 └──────────────────────┘  └──────────────────────┘
@@ -61,7 +61,7 @@ src/
     │   │   └── errors/
     │   │       └── UsuarioJaCadastradoError.ts     # Erro customizado
     │   └── ports/                   # Contratos/Interfaces
-    │       ├── CrudGenerico.ts              # Interface CRUD genérica
+    │       ├── UsuarioRepository.ts              # Interface CRUD genérica
     │       └── ProvedorCriptografia.ts      # Interface de criptografia
     │
     └── adapters/                     # Implementações concretas
@@ -98,7 +98,7 @@ Define contratos que o domínio depende, sem conhecer a implementação.
 
 ```typescript
 // Qualquer coisa que implemente isso pode ser usada
-interface CrudGenerico<T> {
+interface UsuarioRepository {
   adicionar(item: T): Promise<T>;
   buscaPor(campo: string, valor: any): Promise<T | null>;
 }
@@ -250,3 +250,10 @@ O workflow do GitHub Actions executa `npm ci`, `npm run build`, `npm test -- --r
 O banco SQLite local não deve ser versionado. Execute `npm run migration:up` para inicializar a base de desenvolvimento quando necessário. O banco anteriormente presente no Git ainda pode ser encontrado no histórico antigo.
 
 Na revisão de novembro de 2026, a auditoria de dependências passou sem alertas de severidade alta ou crítica, mas ainda reportou 16 moderados e 4 baixos (principalmente dependências transitivas de ferramentas de desenvolvimento). O controle de qualidade continua bloqueando novos alertas altos/críticos. Os alertas remanescentes devem ser acompanhados; a aprovação no CI **não** significa ausência de riscos.
+
+
+### Porta de persistência orientada ao domínio
+
+Os casos de uso dependem de `UsuarioRepository`, com métodos explícitos `buscarPorEmail(email)` e `adicionar(usuario)`. Dessa forma, eles não precisam conhecer nomes de colunas SQL nem a tecnologia de armazenamento. O adapter `UsuarioCrud` traduz esse contrato para operações Knex/SQLite.
+
+A suíte `test/UsecasesUnit.test.ts` valida regras e falhas usando fakes em memória, **sem inicializar SQLite**. Os testes de integração com Knex permanecem separados para validar a persistência real.
