@@ -6,7 +6,7 @@ Um projeto exemplo que demonstra os princípios de **Arquitetura Limpa** (Clean 
 
 Este projeto ilustra como desacoplar a lógica de negócio das dependências externas (banco de dados, criptografia, etc.) através de interfaces (ports) e implementações concretas (adapters).
 
-**Caso de Uso**: Sistema de gerenciamento de usuários com autenticação.
+**Caso de uso**: cadastro e busca de usuários com armazenamento seguro da senha. Não há login, autenticação HTTP ou emissão de tokens neste exemplo.
 
 ## 🛠️ Stack Tecnológico
 
@@ -115,6 +115,25 @@ Conecta o domínio com o mundo externo (banco, criptografia, APIs, etc).
 - **CriptografiaSenha**: Implementação simples (inverte a string) - útil para testes
 - **CriptografiaSenhaReal**: Implementação real com bcrypt - para produção
 - **UsuarioCrud**: Implementa operações de banco via Knex + SQLite
+
+## Demonstração executável
+
+Este repositório apresenta um **exemplo de linha de comando** e não uma API HTTP. O ponto de entrada `src/index.ts` é o *composition root*: instancia os adapters de persistência (Knex/SQLite) e criptografia (bcrypt), aplica as migrations e os conecta aos casos de uso.
+
+```bash
+npm ci
+npm run demo
+```
+
+A demonstração cria um usuário fictício com e-mail aleatório, persiste a senha usando bcrypt, consulta o registro e imprime **somente ID, nome e e-mail**. Nenhuma senha ou hash é exibido. O banco SQLite é local e ignorado pelo Git.
+
+Para escolher outro arquivo SQLite, configure `SQLITE_DB_PATH` com um caminho de arquivo em um diretório existente:
+
+```bash
+SQLITE_DB_PATH=/tmp/hexagonal-demo.sqlite3 npm run demo
+```
+
+Execute `npm test -- --runInBand --ci` para validar as regras do núcleo com mocks e a persistência com bancos descartáveis. A entidade mantém a senha como hash (campo obrigatório); a validação de nome, e-mail e senha de entrada é realizada no caso de uso de criação. Essas verificações são básicas e não substituem uma política completa de senhas nem uma camada de interface.
 
 ## 🚀 Como Usar
 
