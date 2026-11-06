@@ -5,10 +5,7 @@ const path = require('path');
 module.exports = {
     client: 'better-sqlite3',
     connection: {
-        filename: path.resolve(__dirname, 'banco.sqlite3'),
-    },
-    options: {
-      safeIntegers: true,
+        filename: process.env.SQLITE_DB_PATH || path.resolve(__dirname, 'banco.sqlite3'),
     },
     migrations: {
         tableName: 'knex_migrations',
@@ -18,8 +15,8 @@ module.exports = {
         directory: path.resolve(__dirname, 'seeds'),
     },
     pool: {
-        min: 2,
-        max: 10,        
+        min: 1,
+        max: 1,
     },
     useNullAsDefault: true,
 };

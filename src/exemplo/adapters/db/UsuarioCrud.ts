@@ -9,17 +9,15 @@ export default class UsuarioCrud implements CrudGenerico<UsuarioModel> {
 
     async adicionar(item: UsuarioModel): Promise<UsuarioModel> {
 
-        return conexao
-                .insert(item)
-                .into(UsuarioCrud.tableUsuarios);   
+        await conexao(UsuarioCrud.tableUsuarios).insert(item);
+        return item;   
     }
     
     async buscaPor(campo: string, valor: any): Promise<UsuarioModel | null> {
 
-        return conexao               
-                .select("*")
-                .from(UsuarioCrud.tableUsuarios)
-                .where(campo, valor)
-                .first();
+        const usuario = await conexao(UsuarioCrud.tableUsuarios)
+            .where(campo, valor)
+            .first<UsuarioModel>();
+        return usuario ?? null;
     }
 }

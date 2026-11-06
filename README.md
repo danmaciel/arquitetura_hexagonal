@@ -16,7 +16,7 @@ Este projeto ilustra como desacoplar a lógica de negócio das dependências ext
 | **Node.js** | ESNext | Runtime JavaScript |
 | **Jest** | 30.2 | Framework de testes |
 | **Knex.js** | 3.1 | Query builder SQL |
-| **SQLite3** | 12.6 | Banco de dados |
+| **SQLite (better-sqlite3)** | 12.6 | Banco de dados |
 | **bcrypt** | 6.0 | Criptografia de senhas |
 
 ## 🏛️ Arquitetura
@@ -73,7 +73,7 @@ src/
             └── knex/
                 ├── conexao.ts               # Instância da conexão
                 ├── knexfile.js              # Configuração do Knex
-                ├── banco.sqlite3            # Banco de dados
+                ├── banco.sqlite3            # Banco local gerado (ignorado pelo Git)
                 └── migrations/              # Scripts de migração
 
 test/
@@ -146,7 +146,7 @@ Compila TypeScript em JavaScript na pasta `dist/`.
 npm test
 ```
 
-Executa todos os testes Jest com automático reload.
+Executa os testes Jest. As suítes criam bancos SQLite temporários, aplicam as migrations e removem os arquivos após sua execução, sem modificar o banco de desenvolvimento.
 
 #### Testes Inclusos
 
@@ -241,3 +241,12 @@ danmaciel
 ---
 
 **Última atualização**: 9 de março de 2026
+
+
+## Verificações automatizadas
+
+O workflow do GitHub Actions executa `npm ci`, `npm run build`, `npm test -- --runInBand --ci` e `npm audit --audit-level=high`.
+
+O banco SQLite local não deve ser versionado. Execute `npm run migration:up` para inicializar a base de desenvolvimento quando necessário. O banco anteriormente presente no Git ainda pode ser encontrado no histórico antigo.
+
+Na revisão de novembro de 2026, a auditoria de dependências passou sem alertas de severidade alta ou crítica, mas ainda reportou 16 moderados e 4 baixos (principalmente dependências transitivas de ferramentas de desenvolvimento). O controle de qualidade continua bloqueando novos alertas altos/críticos. Os alertas remanescentes devem ser acompanhados; a aprovação no CI **não** significa ausência de riscos.

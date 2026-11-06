@@ -3,6 +3,7 @@ import CriarUsuarioUsecase from "../src/exemplo/appcore/domain/usuario/CriarUsua
 import CriptografiaSenha from "../src/exemplo/adapters/auth/CriptografiaSenha";   
 import type UsuarioModel from "../src/exemplo/appcore/domain/usuario/UsuarioModel";
 import conexao from "../src/exemplo/adapters/db/knex/conexao";
+import { rmSync } from "node:fs";
 import UsuarioCrud from "../src/exemplo/adapters/db/UsuarioCrud";
 import UsuarioJaCadastradoError from "../src/exemplo/appcore/domain/errors/UsuarioJaCadastradoError";
 
@@ -15,18 +16,21 @@ const senhaTeste = "123456";
 
 // ensure table empty before and after the suite to avoid uniqueness conflicts
 beforeAll(async () => {
-   await conexao.table('usuarios').truncate();
+    await conexao.migrate.latest();
+    await conexao.table("usuarios").del();
 });
 
 // clean up between each test in case anything lingers
 afterEach(async () => {
-   await conexao.table('usuarios').truncate();
+   await conexao.table("usuarios").del();
 });
 
 // close database connection when the tests finish
 afterAll(async () => {
-    await conexao.table('usuarios').truncate();
+    await conexao.table("usuarios").del();
     await conexao.destroy();
+    const file = process.env.SQLITE_DB_PATH;
+    if (file) rmSync(file, { force: true });
 });
 
 test("Deve criar um usuario", async () => {

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext", // Ou ESNext se estiver usando Type: Module
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "lib": ["ESNext"],
     "rootDir": ".",
     "types": ["jest", "node"],
@@ -13,7 +14,7 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
