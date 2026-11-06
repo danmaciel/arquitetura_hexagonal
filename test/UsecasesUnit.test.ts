@@ -33,6 +33,29 @@ describe("casos de uso com portas falsas (sem banco)", () => {
         expect(user.email).toBe("ana@example.com");
     });
 
+    test("cadastro normaliza e-mail antes de consultar e persistir", async () => {
+        const { repository, crypto } = dependencies();
+        const usecase = new CriarUsuarioUsecase(repository, crypto);
+
+        const user = await usecase.execute("Ana", "  ANA@Example.COM  ", "secret");
+
+        expect(repository.buscarPorEmail).toHaveBeenCalledWith("ana@example.com");
+        expect(user.email).toBe("ana@example.com");
+        expect(repository.adicionar).toHaveBeenCalledWith(user);
+    });
+
+    test("e-mail duplicado com diferença de caixa ou espaços é rejeitado", async () => {
+        const { repository, crypto } = dependencies(existingUser);
+        const usecase = new CriarUsuarioUsecase(repository, crypto);
+
+        await expect(usecase.execute("Ana", " ANA@EXAMPLE.COM ", "secret"))
+            .rejects.toThrow(UsuarioJaCadastradoError);
+
+        expect(repository.buscarPorEmail).toHaveBeenCalledWith("ana@example.com");
+        expect(repository.adicionar).not.toHaveBeenCalled();
+        expect(crypto.criptografar).not.toHaveBeenCalled();
+    });
+
     test("usuário duplicado não é persistido nem tem senha processada", async () => {
         const { repository, crypto } = dependencies(existingUser);
         const usecase = new CriarUsuarioUsecase(repository, crypto);
@@ -59,5 +82,8 @@ describe("casos de uso com portas falsas (sem banco)", () => {
         await expect(find.execute(existingUser.email)).resolves.toBe(existingUser);
         repository.buscarPorEmail.mockResolvedValueOnce(null);
         await expect(find.execute("missing@example.com")).resolves.toBeNull();
+        expect(repository.buscarPorEmail).toHaveBeenLastCalledWith("missing@example.com");
+        await expect(find.execute("  ANA@EXAMPLE.COM  ")).resolves.toBe(existingUser);
+        expect(repository.buscarPorEmail).toHaveBeenLastCalledWith("ana@example.com");
     });
 });

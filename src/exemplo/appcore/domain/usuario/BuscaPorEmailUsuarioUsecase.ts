@@ -9,7 +9,7 @@ export default class BuscaPorEmailUsuarioUsecase {
     ) {}
 
     async execute(email: string) {
-        const usuario = await this.colecao.buscarPorEmail(email);
+        const usuario = await this.colecao.buscarPorEmail(email.trim().toLowerCase());
         return usuario || null; 
     }
 }

@@ -16,14 +16,15 @@ export default class CriarUsuarioUsecase {
         if (!nome.trim()) {
             throw new Error("O nome do usuário é obrigatório.");
         }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        const emailNormalizado = email.trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNormalizado)) {
             throw new Error("Informe um e-mail válido.");
         }
         if (!senha.trim()) {
             throw new Error("A senha não pode estar vazia.");
         }
 
-        const usuarioExistente = await this.colecao.buscarPorEmail(email);
+        const usuarioExistente = await this.colecao.buscarPorEmail(emailNormalizado);
         if (usuarioExistente) {
             throw new UsuarioJaCadastradoError();
         }
@@ -33,7 +34,7 @@ export default class CriarUsuarioUsecase {
         const usuario = new UsuarioModel(
             randomUUID(),
             nome,
-            email,
+            emailNormalizado,
             senhaHash,
         );
         await this.colecao.adicionar(usuario);
