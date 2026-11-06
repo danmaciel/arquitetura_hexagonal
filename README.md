@@ -61,7 +61,7 @@ src/
     │   │   └── errors/
     │   │       └── UsuarioJaCadastradoError.ts     # Erro customizado
     │   └── ports/                   # Contratos/Interfaces
-    │       ├── UsuarioRepository.ts              # Interface CRUD genérica
+    │       ├── UsuarioRepository.ts              # Porta tipada de usuários
     │       └── ProvedorCriptografia.ts      # Interface de criptografia
     │
     └── adapters/                     # Implementações concretas
@@ -99,8 +99,8 @@ Define contratos que o domínio depende, sem conhecer a implementação.
 ```typescript
 // Qualquer coisa que implemente isso pode ser usada
 interface UsuarioRepository {
-  adicionar(item: T): Promise<T>;
-  buscaPor(campo: string, valor: any): Promise<T | null>;
+  adicionar(usuario: UsuarioModel): Promise<UsuarioModel>;
+  buscarPorEmail(email: string): Promise<UsuarioModel | null>;
 }
 
 interface ProvedorCriptografia {
@@ -210,7 +210,7 @@ try {
 // Mock das dependências
 const mockCrud = {
   adicionar: jest.fn(),
-  buscaPor: jest.fn().mockResolvedValue(null),
+  buscarPorEmail: jest.fn().mockResolvedValue(null),
 };
 const mockCriptografia = {
   criptografar: jest.fn().mockReturnValue("hash"),
@@ -220,7 +220,7 @@ const mockCriptografia = {
 const usecase = new CriarUsuarioUsecase(mockCrud, mockCriptografia);
 await usecase.execute("João", "joao@email.com", "senha");
 
-expect(mockCrud.buscaPor).toHaveBeenCalledWith("email", "joao@email.com");
+expect(mockCrud.buscarPorEmail).toHaveBeenCalledWith("joao@email.com");
 expect(mockCriptografia.criptografar).toHaveBeenCalledWith("senha");
 ```
 
