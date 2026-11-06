@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "demo": "npm run build && node dist/src/index.js",
     "test": "jest",
     "migration:make": "knex migrate:make --knexfile ./src/exemplo/adapters/db/knex/knexfile.js",
     "migration:up": "knex migrate:latest --knexfile ./src/exemplo/adapters/db/knex/knexfile.js",
