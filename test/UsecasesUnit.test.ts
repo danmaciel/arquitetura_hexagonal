@@ -11,7 +11,7 @@ describe("casos de uso com portas falsas (sem banco)", () => {
     function dependencies(existing: UsuarioModel | null = null) {
         const repository: jest.Mocked<UsuarioRepository> = {
             adicionar: jest.fn(async (user) => user),
-            buscarPorEmail: jest.fn(async () => existing)
+            buscarPorEmail: jest.fn(async (_email: string) => existing)
         };
         const crypto: jest.Mocked<ProvedorCriptografia> = {
             criptografar: jest.fn((password) => `hashed:${password}`),
