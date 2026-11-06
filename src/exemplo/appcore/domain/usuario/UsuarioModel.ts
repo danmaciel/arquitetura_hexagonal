@@ -1,14 +1,9 @@
-
-export default class UsuarioModel{
-    id: string;
-    nome: string;
-    email: string;
-    senha?: string;
-
-    constructor(id: string, nome: string, email: string, senha: string) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.senha = senha;
-    }
+/** Entidade de usuário utilizada pelo núcleo da aplicação. */
+export default class UsuarioModel {
+    constructor(
+        public readonly id: string,
+        public readonly nome: string,
+        public readonly email: string,
+        public readonly senha: string
+    ) {}
 }
