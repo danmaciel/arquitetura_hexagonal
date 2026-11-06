@@ -7,9 +7,9 @@
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "test": "jest",
-    "migration:make": "knex migrate:make --knexfile ./src/exemplo/adapters/db/knex/knexfile.ts",
-    "migration:up": "knex migrate:latest --knexfile ./src/exemplo/adapters/db/knex/knexfile.ts",
-    "migration:down": "knex migrate:rollback --knexfile ./src/exemplo/adapters/db/knex/knexfile.ts"
+    "migration:make": "knex migrate:make --knexfile ./src/exemplo/adapters/db/knex/knexfile.js",
+    "migration:up": "knex migrate:latest --knexfile ./src/exemplo/adapters/db/knex/knexfile.js",
+    "migration:down": "knex migrate:rollback --knexfile ./src/exemplo/adapters/db/knex/knexfile.js"
   },
   "keywords": [],
   "author": "danmaciel",
