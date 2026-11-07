@@ -37,7 +37,7 @@ sequenceDiagram
     Note over B: Adapter traduz para UsuarioJaCadastradoError
 ```
 
-O diagrama é um cenário conceitual, não um teste executado de concorrência real.
+O diagrama apresenta um interleaving possível. O teste de integração do PR #8 utiliza duas conexões independentes ao mesmo arquivo SQLite e inicia as inserções como promessas concorrentes após ambas as consultas retornarem vazio; não garante sobreposição física dos writes, pois o SQLite serializa as escritas.
 
 ## Consequências e limites
 
@@ -48,7 +48,7 @@ O diagrama é um cenário conceitual, não um teste executado de concorrência r
   deste laboratório; não cobre todas as particularidades de endereços de e-mail.
 - Registros históricos não normalizados exigiriam migração antes de aplicar a
   mesma política em um sistema existente.
-- Os testes cobrem a restrição e a tradução do erro em inserções sequenciais,
-  **não** simulam conexões simultâneas ou cargas concorrentes.
+- Os testes sequenciais verificam a tradução de erro pelo adapter. Um teste separado em `test/ConcorrenciaUsuarios.test.ts` verifica duas conexões independentes, leituras iniciais sem usuário e duas tentativas de inserção disparadas juntas: apenas uma persiste e a outra recebe a violação UNIQUE.
+- Esse teste não simula requisições HTTP, threads/processos distintos, carga elevada, transações longas ou bloqueios de escrita. Não demonstra paralelismo real entre operações síncronas do driver; demonstra a integridade da restrição para duas conexões independentes.
 - Este projeto não implementa uma API HTTP, autenticação ou uma solução
   distribuída de concorrência.
