@@ -7,10 +7,11 @@ O projeto demonstra como implementar casos de uso que dependem de **contratos do
 ## O que o projeto demonstra
 
 - Cadastro e busca de usuários por e-mail.
-- Rejeição de e-mails duplicados e validação básica de entradas.
+- Normalização simplificada de e-mails, rejeição de duplicatas e validação básica de entradas.
+- Garantia de unicidade no SQLite, com tradução da violação específica para erro de domínio.
 - Hash de senha usando o adapter real de bcrypt.
 - Persistência SQLite atrás de uma porta tipada.
-- Testes unitários independentes de infraestrutura e testes de integração com SQLite temporário.
+- Testes unitários independentes de infraestrutura e testes de integração com SQLite temporário, incluindo duas conexões independentes ao mesmo banco.
 - Compilação, testes, execução da demonstração e auditoria de dependências no GitHub Actions.
 
 ## Executar
@@ -96,7 +97,8 @@ sequenceDiagram
     participant CRYPTO as ProvedorCriptografia
     CLI->>UC: execute(nome, email, senha)
     UC->>UC: Validar entradas básicas
-    UC->>REPO: buscarPorEmail(email)
+    UC->>UC: Normalizar e-mail
+    UC->>REPO: buscarPorEmail(emailNormalizado)
     REPO-->>UC: Usuário ou null
     alt Usuário já existe
         UC-->>CLI: UsuarioJaCadastradoError
@@ -104,8 +106,13 @@ sequenceDiagram
         UC->>CRYPTO: criptografar(senha)
         CRYPTO-->>UC: hash
         UC->>REPO: adicionar(usuario)
-        REPO-->>UC: Usuário salvo
-        UC-->>CLI: Usuário criado
+        alt INSERT aceito
+            REPO-->>UC: Usuário salvo
+            UC-->>CLI: Usuário criado
+        else E-mail duplicado no SQLite
+            REPO-->>UC: UsuarioJaCadastradoError
+            UC-->>CLI: Cadastro rejeitado
+        end
     end
 ```
 
@@ -120,7 +127,9 @@ npm test -- --runInBand --ci
 Os testes são organizados em duas categorias:
 
 - **Unitários:** usam implementações simuladas das portas e verificam validações, duplicidade, persistência, busca e propagação de erros, sem inicializar SQLite.
-- **Integração:** usam SQLite temporário, aplicam as migrations e verificam os adapters e os casos de uso contra persistência real.
+- **Integração:** usam SQLite temporário, aplicam as migrations e verificam os adapters e os casos de uso contra persistência real. Um teste usa **duas conexões independentes** ao mesmo arquivo: após ambas não encontrarem o e-mail, somente uma inserção é aceita pela restrição `UNIQUE`. Isso não comprova paralelismo real entre threads ou processos, nem simula carga elevada.
+
+A implementação e as limitações da estratégia de unicidade estão registradas em [ADR 0001 — Unicidade de e-mail](docs/adr/0001-unicidade-email.md).
 
 O workflow `.github/workflows/quality.yml` executa `npm ci`, build TypeScript, testes Jest, demonstração CLI com banco descartável e `npm audit --audit-level=high`.
 
@@ -129,10 +138,11 @@ O workflow `.github/workflows/quality.yml` executa `npm ci`, build TypeScript, t
 - **Escolha de SQLite:** reduz o custo de executar e compreender o exemplo. Não há infraestrutura distribuída, filas ou microsserviços.
 - **Contratos orientados ao domínio:** a porta `UsuarioRepository` evita expor nomes de campos de banco ao núcleo.
 - **Validação de entrada:** confere nome e senha não vazios e formato básico de e-mail. Não constitui validação completa de identidade ou política robusta de senhas.
-- **Cadastro de e-mail duplicado:** há verificação no caso de uso e restrição `unique` no esquema. Concorrência e tratamento específico de violação do banco ainda podem evoluir.
+- **Cadastro de e-mail duplicado:** a consulta prévia é uma conveniência, mas a garantia de integridade está na restrição `UNIQUE` do banco. O adapter converte especificamente a violação em `usuarios.email` para `UsuarioJaCadastradoError`, sem mascarar outros erros. O teste com conexões independentes não cobre concorrência entre processos ou transações longas.
+- **Normalização de e-mail:** `trim().toLowerCase()` é uma política simplificada do laboratório, não uma implementação universal das regras de todos os provedores.
 - **Senha:** o modelo armazena o hash, mas o exemplo não possui autenticação/login, autorização ou gerenciamento de sessão.
-- **Segurança das dependências:** na última auditoria de novembro de 2026, não foram encontrados alertas **altos/críticos**, porém permaneceram **16 moderados e 4 baixos**, acompanhados na [Issue #2](https://github.com/danmaciel/arquitetura_hexagonal/issues/2).
-- **Banco em histórico:** um arquivo SQLite anteriormente versionado foi retirado da versão atual. Isso não apaga os commits antigos; seu conteúdo histórico ainda precisa de revisão.
+- **Segurança das dependências:** o CI executa `npm audit --audit-level=high`, o que não equivale à ausência de vulnerabilidades de severidade menor. O último levantamento do repositório anterior (novembro de 2026) registrou **16 moderadas e 4 baixas**; esses números são históricos e devem ser reconfirmados na [Issue #1](https://github.com/danmaciel/arquitetura_hexagonal/issues/1).
+- **Histórico de dados:** este repositório foi recriado com um histórico sanitizado, removendo um banco SQLite anteriormente versionado. Isso não elimina possíveis cópias de terceiros ou caches do repositório anterior.
 
 ## Referências
 
